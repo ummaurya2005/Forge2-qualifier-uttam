@@ -40,8 +40,7 @@ npm run dev
 ```
 
 ## Live URL
-
-(Add deployed URL here)
+https://forge2-qualifier-uttam.vercel.app
 
 ## GitHub Repository
 
