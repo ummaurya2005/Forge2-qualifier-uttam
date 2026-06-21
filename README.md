@@ -45,4 +45,4 @@ npm run dev
 
 ## GitHub Repository
 
-(Add GitHub repo link here)
+https://github.com/ummaurya2005/Forge2-qualifier-uttam
