@@ -1,34 +1,22 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import Navbar from "./components/Navbar";
+import Dashboard from "./components/Dashboard";
+import AgentPanel from "./components/AgentPanel";
+import TaskBoard from "./components/TaskBoard";
+import ActivityFeed from "./components/ActivityFeed";
+import Footer from "./components/Footer";
 
 function App() {
-  const [boards, setBoards] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/api/boards")
-      .then((res) => setBoards(res.data))
-      .catch((err) => console.error(err));
-  }, []);
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>TaskForge</h1>
+    <>
+      <Navbar />
 
-      {boards.map((board) => (
-        <div
-          key={board.id}
-          style={{
-            border: "1px solid #ccc",
-            padding: "10px",
-            margin: "10px",
-            borderRadius: "8px",
-          }}
-        >
-          {board.name}
-        </div>
-      ))}
-    </div>
+      <Dashboard />
+      <AgentPanel />
+      <TaskBoard />
+      <ActivityFeed />
+
+      <Footer />
+    </>
   );
 }
 
