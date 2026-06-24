@@ -40,11 +40,11 @@ npm run dev
 ```
 
 ## Live URL
-
-(Add deployed URL here)
+https://forge2-qualifier-uttam.vercel.app
 
 ## GitHub Repository
 
+<<<<<<< HEAD
 (Add GitHub repo link here)
 
 
@@ -86,3 +86,6 @@ Human
 → Hermes
 → OpenClaw
 → TaskForge Dashboard
+=======
+https://github.com/ummaurya2005/Forge2-qualifier-uttam
+>>>>>>> 47a065610bfc9a1ae4e40463082a0cbbcf5a267b
