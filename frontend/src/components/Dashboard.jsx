@@ -1,40 +1,55 @@
-function Dashboard() {
-const cardStyle = {
-flex: 1,
-background: "white",
-padding: "20px",
-borderRadius: "10px",
-textAlign: "center",
-boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-};
+import React from "react";
 
-return (
-  <div style={{ padding: "20px" }}>
-    <h1>🚀 TaskForge Agent Command Center</h1>
+function Dashboard({ agents = [], tasks = [] }) {
+  const activeAgents = agents.length;
+  const tasksManaged = tasks.length;
+  const completedTasks = tasks.filter(
+    (task) => task.status === "Done"
+  ).length;
 
-    <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
-      <div style={cardStyle}>
-        <h2>3</h2>
-        <p>Agents</p>
+  return (
+    <div className="container">
+      <div className="title">
+        🚀 TaskForge AI Agent Command Center
       </div>
 
-      <div style={cardStyle}>
-        <h2>8</h2>
-        <p>Tasks</p>
+      <div className="grid stats" style={{ marginTop: "20px" }}>
+        <div className="card">
+          <h2>{activeAgents}</h2>
+          <p>Active Agents</p>
+        </div>
+
+        <div className="card">
+          <h2>{tasksManaged}</h2>
+          <p>Tasks Managed</p>
+        </div>
+
+        <div className="card">
+          <h2>{completedTasks}</h2>
+          <p>Completed Tasks</p>
+        </div>
+
+        <div className="card">
+          <h2 className="status-online">Online</h2>
+          <p>Hermes Supervisor</p>
+        </div>
       </div>
 
-      <div style={cardStyle}>
-        <h2>5</h2>
-        <p>Completed</p>
-      </div>
+      <div
+        className="card"
+        style={{ marginTop: "20px" }}
+      >
+        <h2>🧠 Hermes AI Supervisor</h2>
 
-      <div style={cardStyle}>
-        <h2>🟢</h2>
-        <p>System Online</p>
+        <p>
+          Hermes continuously analyzes incoming tasks,
+          selects the most suitable agent,
+          assigns work automatically,
+          and records every action in the activity feed.
+        </p>
       </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default Dashboard;

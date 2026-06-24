@@ -13,16 +13,33 @@ class TaskController extends Controller
         return Task::all();
     }
 
-    public function store(Request $request)
-    {
-        $task = Task::create($request->all());
+   public function store(Request $request)
+{
+    $task = Task::create($request->all());
 
-        Activity::create([
-            'message' => 'New task created: ' . $task->title
-        ]);
+    // Hermes Agent Logic
+    $assignedAgent = "OpenClaw";
 
-        return $task;
+    if (str_contains(strtolower($task->title), 'react')) {
+        $assignedAgent = "Frontend Agent";
     }
+    elseif (str_contains(strtolower($task->title), 'api')) {
+        $assignedAgent = "Backend Agent";
+    }
+    elseif (str_contains(strtolower($task->title), 'test')) {
+        $assignedAgent = "QA Agent";
+    }
+
+    Activity::create([
+        'message' => "Hermes assigned '{$task->title}' to {$assignedAgent}"
+    ]);
+
+    return response()->json([
+        'task' => $task,
+        'assigned_agent' => $assignedAgent,
+        'supervisor' => 'Hermes'
+    ]);
+}
 
     public function show(Task $task)
     {

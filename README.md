@@ -46,3 +46,43 @@ npm run dev
 ## GitHub Repository
 
 (Add GitHub repo link here)
+
+
+
+## Multi-Agent Architecture
+
+TaskForge demonstrates collaboration between:
+
+### Hermes
+
+Planning Agent
+
+Responsibilities:
+
+* Create tasks
+* Prioritize work
+* Coordinate workflow
+
+### OpenClaw
+
+Execution Agent
+
+Responsibilities:
+
+* Generate code
+* Complete assigned tasks
+* Update project status
+
+### Human Supervisor
+
+Responsibilities:
+
+* Approve work
+* Monitor progress
+
+Workflow:
+
+Human
+→ Hermes
+→ OpenClaw
+→ TaskForge Dashboard

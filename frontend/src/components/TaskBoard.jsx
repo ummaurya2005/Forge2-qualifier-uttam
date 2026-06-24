@@ -1,68 +1,82 @@
-import { useState } from "react";
+import { useEffect } from "react";
 
-function TaskBoard() {
-  const [taskTitle, setTaskTitle] = useState("");
-  const [agent, setAgent] = useState("OpenClaw");
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Build Laravel API",
-      agent: "OpenClaw",
-      status: "Backlog",
-    },
-    {
-      id: 2,
-      title: "Create Sprint Plan",
-      agent: "Hermes",
-      status: "In Progress",
-    },
-  ]);
+function TaskBoard({ refreshTasks, tasks = [], setTasks }) {
+  const loadTasks = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/tasks");
+      const data = await response.json();
 
-  const addTask = () => {
-    if (!taskTitle.trim()) return;
+      const formattedTasks = data.map((task) => ({
+        ...task,
+        status: task.status || "Backlog",
+        supervisor: "Hermes",
+      }));
 
-    setTasks([
-      ...tasks,
-      {
-        id: Date.now(),
-        title: taskTitle,
-        agent,
-        status: "Backlog",
-      },
-    ]);
-
-    setTaskTitle("");
+      setTasks(formattedTasks);
+    } catch (error) {
+      console.error("Failed to load tasks", error);
+    }
   };
 
-  const moveTask = (id, newStatus) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, status: newStatus } : task
-      )
-    );
+  useEffect(() => {
+    loadTasks();
+
+    const interval = setInterval(loadTasks, 3000);
+
+    return () => clearInterval(interval);
+  }, [refreshTasks, setTasks]);
+
+  const moveTask = async (id, newStatus) => {
+    try {
+      await fetch(`http://127.0.0.1:8000/api/tasks/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      setTasks(
+        tasks.map((task) =>
+          task.id === id ? { ...task, status: newStatus } : task
+        )
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const deleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
+  const deleteTask = async (id) => {
+    try {
+      await fetch(`http://127.0.0.1:8000/api/tasks/${id}`, {
+        method: "DELETE",
+      });
+
+      setTasks(tasks.filter((task) => task.id !== id));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const renderColumn = (title) => (
+  const renderColumn = (columnStatus) => (
     <div
       style={{
         flex: 1,
-        background: "#f3f4f6",
+        background: "#147914",
         padding: "15px",
         borderRadius: "10px",
       }}
     >
-      <h3>{title}</h3>
+      <h3>{columnStatus}</h3>
+
       {tasks
-        .filter((task) => task.status === title)
+        .filter((task) => task.status === columnStatus)
         .map((task) => (
           <div
             key={task.id}
             style={{
               background: "white",
+              color: "black",
               padding: "10px",
               marginBottom: "10px",
               borderRadius: "8px",
@@ -70,23 +84,24 @@ function TaskBoard() {
           >
             <strong>{task.title}</strong>
             <br />
-            Agent: {task.agent}
+            Priority: {task.priority}
             <br />
+            Supervisor: Hermes
             <br />
 
-            {title === "Backlog" && (
+            {columnStatus === "Backlog" && (
               <button onClick={() => moveTask(task.id, "In Progress")}>
                 Start
               </button>
             )}
 
-            {title === "In Progress" && (
+            {columnStatus === "In Progress" && (
               <button onClick={() => moveTask(task.id, "Review")}>
                 Review
               </button>
             )}
 
-            {title === "Review" && (
+            {columnStatus === "Review" && (
               <button onClick={() => moveTask(task.id, "Done")}>
                 Complete
               </button>
@@ -106,36 +121,12 @@ function TaskBoard() {
   return (
     <div style={{ padding: "20px" }}>
       <h2>📋 Task Board</h2>
-      <div style={{ marginBottom: "20px" }}>
-        <input
-          value={taskTitle}
-          onChange={(e) => setTaskTitle(e.target.value)}
-          placeholder="Task title"
-          style={{ padding: "10px", width: "250px" }}
-        />
-
-        <select
-          value={agent}
-          onChange={(e) => setAgent(e.target.value)}
-          style={{ marginLeft: "10px", padding: "10px" }}
-        >
-          <option>Hermes</option>
-          <option>OpenClaw</option>
-          <option>Uttam</option>
-        </select>
-
-        <button
-          onClick={addTask}
-          style={{
-            marginLeft: "10px",
-            padding: "10px",
-          }}
-        >
-          Add Task
-        </button>
-      </div>
-
-      <div style={{ display: "flex", gap: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+        }}
+      >
         {renderColumn("Backlog")}
         {renderColumn("In Progress")}
         {renderColumn("Review")}

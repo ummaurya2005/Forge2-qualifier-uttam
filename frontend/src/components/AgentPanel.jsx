@@ -1,32 +1,67 @@
-function AgentPanel() {
-const agents = [
-{ name: "Hermes", role: "Planner", status: "Online" },
-{ name: "OpenClaw", role: "Developer", status: "Online" },
-{ name: "Uttam", role: "Supervisor", status: "Online" },
-];
+import React from "react";
 
-return (
-  <div style={{ padding: "20px" }}>
-    <h2>🤖 Agent Status</h2>
+function AgentPanel({ agents = [] }) {
+  const defaultAgents = [
+    {
+      name: "Hermes",
+      role: "Supervisor Agent",
+      status: "Online",
+    },
+    {
+      name: "OpenClaw",
+      role: "Execution Agent",
+      status: "Online",
+    },
+    {
+      name: "Frontend Agent",
+      role: "React Specialist",
+      status: "Online",
+    },
+    {
+      name: "Backend Agent",
+      role: "API Specialist",
+      status: "Online",
+    },
+    {
+      name: "QA Agent",
+      role: "Testing Agent",
+      status: "Online",
+    },
+  ];
 
-    {agents.map((agent, index) => (
+  const agentList = agents.length ? agents : defaultAgents;
+
+  return (
+    <div className="container">
+      <h2>🤖 Active AI Agents</h2>
+
       <div
-        key={index}
         style={{
-          background: "white",
-          padding: "10px",
-          marginBottom: "10px",
-          borderRadius: "8px",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit,minmax(220px,1fr))",
+          gap: "20px",
         }}
       >
-        <strong>{agent.name}</strong> - {agent.role}
-        <br />
-        Status: 🟢 {agent.status}
+        {agentList.map((agent) => (
+          <div className="card" key={agent.name}>
+            <h3>{agent.name}</h3>
+
+            <p>{agent.role}</p>
+
+            <p
+              className={
+                "status-" +
+                agent.status.toLowerCase()
+              }
+            >
+              ● {agent.status}
+            </p>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
-);
+    </div>
+  );
 }
 
 export default AgentPanel;
