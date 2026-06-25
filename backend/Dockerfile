@@ -19,8 +19,8 @@ WORKDIR /app
 # Copy application files
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+# FIX: Added --no-scripts to prevent Laravel from crashing during build
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Set up permissions and ensure SQLite database exists safely
 RUN mkdir -p database storage bootstrap/cache \
@@ -29,5 +29,7 @@ RUN mkdir -p database storage bootstrap/cache \
 
 EXPOSE 10000
 
-# Run migrations and start the built-in PHP server
-CMD php artisan migrate --force && exec php artisan serve --host=0.0.0.0 --port=10000
+# FIX: Moved the missing automated scripts to run safely at runtime instead
+CMD php artisan package:discover --ansi && \
+    php artisan migrate --force && \
+    exec php artisan serve --host=0.0.0.0 --port=10000
