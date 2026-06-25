@@ -1,7 +1,7 @@
-# Use PHP 8.5 CLI
+# PHP 8.5
 FROM php:8.5-cli
 
-# Install required packages
+# Install system packages
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -15,27 +15,32 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# Working directory
 WORKDIR /var/www/html
 
-# Copy Laravel project
+# Copy project
 COPY . .
 
-# Install PHP dependencies
+# Install dependencies
 RUN composer install \
     --no-dev \
     --optimize-autoloader
 
-# Create SQLite database (if you're still using SQLite)
+# Create SQLite database
 RUN mkdir -p database \
     && touch database/database.sqlite
 
 # Set permissions
-RUN chmod -R 775 storage bootstrap/cache
+RUN chmod -R 777 storage bootstrap/cache database
 
-# Expose Render port
-EXPOSE 10000
+# Laravel cache
+RUN php artisan config:clear
+RUN php artisan route:clear
+RUN php artisan view:clear
 
-# Start Laravel
+# Railway uses this port
+EXPOSE 8080
+
+# Start application
 CMD php artisan migrate --force && \
-    php artisan serve --host=0.0.0.0 --port=10000
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
