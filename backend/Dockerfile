@@ -1,6 +1,6 @@
-FROM php:8.2-cli
+FROM php:8.5-cli
 
-# Install system dependencies and PHP extensions
+# Install system packages and PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -11,25 +11,27 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_sqlite zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy Composer from the official image
+# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Working directory
 WORKDIR /app
 
-# Copy application files
+# Copy application
 COPY . .
 
-# FIX: Added --no-scripts to prevent Laravel from crashing during build
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+# Install dependencies
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction
 
-# Set up permissions and ensure SQLite database exists safely
+# Create SQLite database
 RUN mkdir -p database storage bootstrap/cache \
-    && [ -f database/database.sqlite ] || touch database/database.sqlite \
+    && touch database/database.sqlite \
     && chmod -R 777 storage bootstrap/cache database
 
 EXPOSE 10000
 
-# FIX: Moved the missing automated scripts to run safely at runtime instead
-CMD php artisan package:discover --ansi && \
-    php artisan migrate --force && \
+CMD php artisan migrate --force && \
     exec php artisan serve --host=0.0.0.0 --port=10000
