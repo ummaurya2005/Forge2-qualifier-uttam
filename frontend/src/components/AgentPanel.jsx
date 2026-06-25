@@ -1,35 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-function AgentPanel({ agents = [] }) {
-  const defaultAgents = [
-    {
-      name: "Hermes",
-      role: "Supervisor Agent",
-      status: "Online",
-    },
-    {
-      name: "OpenClaw",
-      role: "Execution Agent",
-      status: "Online",
-    },
-    {
-      name: "Frontend Agent",
-      role: "React Specialist",
-      status: "Online",
-    },
-    {
-      name: "Backend Agent",
-      role: "API Specialist",
-      status: "Online",
-    },
-    {
-      name: "QA Agent",
-      role: "Testing Agent",
-      status: "Online",
-    },
-  ];
+function AgentPanel() {
+  const [agents, setAgents] = useState([]);
 
-  const agentList = agents.length ? agents : defaultAgents;
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/agents`)
+      .then((res) => res.json())
+      .then((data) => setAgents(data))
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
     <div className="container">
@@ -38,23 +17,15 @@ function AgentPanel({ agents = [] }) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit,minmax(220px,1fr))",
+          gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
           gap: "20px",
         }}
       >
-        {agentList.map((agent) => (
-          <div className="card" key={agent.name}>
+        {agents.map((agent) => (
+          <div className="card" key={agent.id}>
             <h3>{agent.name}</h3>
-
             <p>{agent.role}</p>
-
-            <p
-              className={
-                "status-" +
-                agent.status.toLowerCase()
-              }
-            >
+            <p className={"status-" + (agent.status || "offline").toLowerCase()}>
               ● {agent.status}
             </p>
           </div>

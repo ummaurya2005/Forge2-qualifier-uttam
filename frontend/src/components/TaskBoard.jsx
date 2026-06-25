@@ -3,7 +3,7 @@ import { useEffect } from "react";
 function TaskBoard({ refreshTasks, tasks = [], setTasks }) {
   const loadTasks = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/tasks");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/tasks`);
       const data = await response.json();
 
       const formattedTasks = data.map((task) => ({
@@ -19,16 +19,14 @@ function TaskBoard({ refreshTasks, tasks = [], setTasks }) {
   };
 
   useEffect(() => {
-    loadTasks();
-
-    const interval = setInterval(loadTasks, 3000);
-
-    return () => clearInterval(interval);
-  }, [refreshTasks, setTasks]);
+    fetch(`${import.meta.env.VITE_API_URL}/tasks`)
+      .then((res) => res.json())
+      .then((data) => setTasks(data));
+  }, []);
 
   const moveTask = async (id, newStatus) => {
     try {
-      await fetch(`http://127.0.0.1:8000/api/tasks/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/tasks/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +46,7 @@ function TaskBoard({ refreshTasks, tasks = [], setTasks }) {
 
   const deleteTask = async (id) => {
     try {
-      await fetch(`http://127.0.0.1:8000/api/tasks/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/tasks/${id}`, {
         method: "DELETE",
       });
 
