@@ -1,9 +1,13 @@
 import { useEffect } from "react";
 
-function TaskBoard({ refreshTasks, tasks = [], setTasks }) {
+function TaskBoard({ tasks = [], setTasks }) {
+
   const loadTasks = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/tasks`);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/tasks`
+      );
+
       const data = await response.json();
 
       const formattedTasks = data.map((task) => ({
@@ -14,14 +18,19 @@ function TaskBoard({ refreshTasks, tasks = [], setTasks }) {
 
       setTasks(formattedTasks);
     } catch (error) {
-      console.error("Failed to load tasks", error);
+      console.error("Failed to load tasks:", error);
     }
   };
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/tasks`)
-      .then((res) => res.json())
-      .then((data) => setTasks(data));
+    loadTasks();
+
+    // AJAX Auto Refresh every 2 seconds
+    const interval = setInterval(() => {
+      loadTasks();
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const moveTask = async (id, newStatus) => {
@@ -31,14 +40,12 @@ function TaskBoard({ refreshTasks, tasks = [], setTasks }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({
+          status: newStatus,
+        }),
       });
 
-      setTasks(
-        tasks.map((task) =>
-          task.id === id ? { ...task, status: newStatus } : task
-        )
-      );
+      loadTasks();
     } catch (error) {
       console.error(error);
     }
@@ -50,7 +57,7 @@ function TaskBoard({ refreshTasks, tasks = [], setTasks }) {
         method: "DELETE",
       });
 
-      setTasks(tasks.filter((task) => task.id !== id));
+      loadTasks();
     } catch (error) {
       console.error(error);
     }
@@ -81,26 +88,47 @@ function TaskBoard({ refreshTasks, tasks = [], setTasks }) {
             }}
           >
             <strong>{task.title}</strong>
+
             <br />
+
+            {task.description}
+
+            <br />
+
             Priority: {task.priority}
+
             <br />
+
             Supervisor: Hermes
+
             <br />
 
             {columnStatus === "Backlog" && (
-              <button onClick={() => moveTask(task.id, "In Progress")}>
+              <button
+                onClick={() =>
+                  moveTask(task.id, "In Progress")
+                }
+              >
                 Start
               </button>
             )}
 
             {columnStatus === "In Progress" && (
-              <button onClick={() => moveTask(task.id, "Review")}>
+              <button
+                onClick={() =>
+                  moveTask(task.id, "Review")
+                }
+              >
                 Review
               </button>
             )}
 
             {columnStatus === "Review" && (
-              <button onClick={() => moveTask(task.id, "Done")}>
+              <button
+                onClick={() =>
+                  moveTask(task.id, "Done")
+                }
+              >
                 Complete
               </button>
             )}
@@ -119,6 +147,7 @@ function TaskBoard({ refreshTasks, tasks = [], setTasks }) {
   return (
     <div style={{ padding: "20px" }}>
       <h2>📋 Task Board</h2>
+
       <div
         style={{
           display: "flex",

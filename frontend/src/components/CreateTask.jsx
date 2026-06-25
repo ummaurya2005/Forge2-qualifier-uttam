@@ -6,7 +6,7 @@ function CreateTask({ onTaskCreated }) {
 
   const createTask = async () => {
     const response = await fetch(
-      '${import.meta.env.VITE_API_URL}/tasks',
+      `${import.meta.env.VITE_API_URL}/tasks`,
       {
         method: "POST",
         headers: {
